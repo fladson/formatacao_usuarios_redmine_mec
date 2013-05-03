@@ -28,7 +28,6 @@ class Usuario
   end
   
   def formatar_sobrenome
-    
     if(@sobrenome.include? 'De')
       @sobrenome.gsub!( /D[De]/, "de" )
     elsif(@sobrenome.include? 'Da')
@@ -41,12 +40,19 @@ class Usuario
   end
   
   def formatar_usuario
-    concatenacao =("#{@nome}" << " " << "#{@sobrenome}").removeaccents.gsub(/[^0-9A-Za-z]/, '')
+    # concatenacao recebe nome + sobrenome sem acentos
+    concatenacao = ("#{@nome}" << " " << "#{@sobrenome}").removeaccents
     @usuario = (concatenacao.split.first << "." << concatenacao.split.last).downcase
+    # atribuindo para posterior comparacao
     @usuario_ideal = @usuario
     @nome = concatenacao.split(/\.?\s+/, 2)[0].capitalize
     sobrenome_array = concatenacao.split(/\.?\s+/, 2)[1].split(' ')
     @sobrenome = sobrenome_array.uniq.map(&:capitalize).join(' ')
+    #@usuario.gsub!(/[^0-9A-Za-z]/, '')
+    # caso o usuario ja possua o formato nome.sobrenome, mesmo que seja outro sobrenome, deixar passar
+    if @usuario_antigo.include?(".") && @sobrenome.downcase.include?(@usuario_antigo.split('.')[1])
+      @usuario_ideal = @usuario_antigo
+    end
     formatar_sobrenome
   end
   
@@ -55,11 +61,11 @@ class Usuario
   end
   
   def valido_antigo?
-    (@usuario_antigo.eql?@usuario_ideal)? true : false 
+    (@usuario_antigo.downcase.eql?@usuario_ideal)? true : false
   end
   
   def to_s
-    puts "#{@usuario_antigo};#{@usuario};#{@nome};#{@sobrenome};#{@email}"
+    "#{@usuario_antigo};#{@usuario};#{@nome};#{@sobrenome};#{@email}\n"
   end
   
   def to_s2

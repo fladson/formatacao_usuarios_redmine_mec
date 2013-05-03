@@ -49,5 +49,3 @@ class RedmineAPI
     get_usuarios
   end
 end
-
-RedmineAPI.usuarios

@@ -5,6 +5,8 @@ require_relative 'RedmineAPI'
 class Main
   @@usuarios_validos = []
   @@usuarios_invalidos = []
+  EMAIL = ""
+  SENHA_EMAIL = ""
   @@count = {"ano"=>2594,"residencia"=>14,"duplicata"=>127,"mec"=>2}
   def self.algoritmo_alocacao
     saida = ""
@@ -16,17 +18,15 @@ class Main
   end
     
   def self.verificar
-    count = 0
+    saida = ""
     RedmineAPI.usuarios.each do |item|
       u = Usuario.new(item)
-      if(u.id!=1) # retirando o admin dos usuarios_invalidos tive erro ao tentar alterar
+#      if(u.id!=1) # retirando o admin dos usuarios_invalidos tive erro ao tentar alterar
         (u.valido_antigo?)? @@usuarios_validos << u : @@usuarios_invalidos << u
-      end
+ #     end
     end
-    
-    @@usuarios_invalidos.each do |usuario| 
-      puts usuario.to_s
-    end
+    @@usuarios_invalidos.each{|u| saida << u.to_s if !saida.include?(u.to_s)}
+    File.new("professores_formatados.txt", "w").write(saida)
     
     puts "Usuários válidos: #{@@usuarios_validos.size}\nUsuários inválidos: #{@@usuarios_invalidos.size}"
   end
@@ -46,8 +46,8 @@ class Main
 #         rescue Net::IMAP::NoResponseError
 #           puts @@msg_erro_envio_email
 #         else
-          sucesso(u)
-          #end
+#          sucesso(u)
+#         end
       else
         puts @@msg_erro_alteracao_usuario
       end
@@ -55,7 +55,7 @@ class Main
   end
   
   def self.enviar_email(email, conteudo)
-    Gmail.new("fladsonthiago@gmail.com", "opaco,725898") do |gmail|
+    Gmail.new("EMAIL", "SENHA_EMAIL") do |gmail|
       gmail.deliver do
         to email
         subject "Alteração de login no projeto de Monitoramento e Avaliação de Programas SETEC/MEC"
@@ -82,6 +82,5 @@ class Main
     messages_count = imap.status('INBOX', ['MESSAGES'])['MESSAGES']
     puts "Seeing #{messages_count} messages in INBOX"
   end
-  @@msg_erro_envio_email = "\n=========================================================================\nERRO: Ocorreu algum erro no envio do email, favor checar log do servidor.\n========================================================================="
-  @@msg_erro_alteracao_usuario = "\n===============================================================================\nERRO: Ocorreu algum erro na alteração do usuário, favor checar log do servidor.\n==============================================================================="
 end
+Main.verificar
