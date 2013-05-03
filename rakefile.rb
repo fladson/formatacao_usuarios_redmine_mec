@@ -12,3 +12,8 @@ desc 'Atualiza o login do usuario para a formatacao correta e envia um email de 
 task :atualizar_usuarios_invalidos do
   Main.alterar_usuarios_invalidos
 end
+
+desc 'Gera um arquivo.txt com todos os professores aptos para avaliações, seguindo-se regras pré-definidas'
+task :atualizar_usuarios_invalidos do
+  Main.algoritmo_alocacao
+end
